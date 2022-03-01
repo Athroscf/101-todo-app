@@ -71,6 +71,8 @@ interface iAddModalProps {
 
 const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
   const dispatch = useDispatch();
+  const [ title, setTitle ] = useState<any>();
+  const [ description, setDescription ] = useState<any>();
 
   return (
     <IonModal isOpen={isModalOpen}>
@@ -95,12 +97,16 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
         <IonHeader>
           <IonToolbar>
             <IonInput
-              placeholder='Title'/>
+              placeholder='Title'
+              value={title}
+              onIonChange={(e) => setTitle(e.detail.value)}/>
           </IonToolbar>
         </IonHeader>
         <IonTextarea
           autoGrow
-          autofocus/>
+          autofocus
+          value={description}
+          onIonChange={(e) => setDescription(e.detail.value)}/>
       </IonContent>
     </IonModal>
   );
