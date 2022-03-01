@@ -2,12 +2,20 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const appSlice = createSlice({
   name: 'app',
-  initialState: {},
+  initialState: {
+    isModalOpen: false,
+  },
   reducers: {
     initApp(state, action) {},
+    openModal(state, action) {
+      state.isModalOpen = action.payload;
+    }
   }
 });
 
-export const { initApp } = appSlice.actions;
+export const {
+  initApp,
+  openModal
+} = appSlice.actions;
 
 export default appSlice.reducer;

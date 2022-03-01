@@ -1,25 +1,34 @@
 import {
+  IonButton,
   IonButtons,
   IonContent,
   IonFab,
   IonFabButton,
   IonHeader,
   IonIcon,
+  IonInput,
   IonMenuButton,
+  IonModal,
   IonPage,
+  IonTextarea,
   IonTitle,
   IonToolbar
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import { useState } from 'react';
 import { useParams } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Notes from '../components/Notes';
 import Todos from '../components/Todos';
 import './Page.css';
+import { RootState } from '../redux/store';
+import { openModal } from '../redux/appSlice';
 
 const Page: React.FC = () => {
   const { name } = useParams<{ name: string; }>();
+  const { isModalOpen } = useSelector((state: RootState) => state)
+  const dispatch = useDispatch();
 
   return (
     <IonPage>
@@ -41,9 +50,9 @@ const Page: React.FC = () => {
         { name === "notes" && <Notes name={name} /> }
         { name === "todos" && <Notes name={name} /> }
       </IonContent>
-
+      <AddModal isModalOpen={isModalOpen}/>
       <IonFab horizontal='end' vertical='bottom'>
-        <IonFabButton>
+        <IonFabButton onClick={() => dispatch(openModal(true))}>
           <IonIcon icon={add}/>
         </IonFabButton>
       </IonFab>
@@ -52,3 +61,41 @@ const Page: React.FC = () => {
 };
 
 export default Page;
+
+interface iAddModalProps {
+  isModalOpen: boolean
+};
+
+const AddModal: React.FC<iAddModalProps> = ({ isModalOpen }) => {
+  const dispatch = useDispatch();
+
+  return (
+    <IonModal isOpen={isModalOpen}>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>
+            Add Note
+          </IonTitle>
+          <IonButtons slot='start'>
+            <IonButton onClick={() => dispatch(openModal(false))}>
+              Close
+            </IonButton>
+          </IonButtons>
+          <IonButtons slot='end'>
+            <IonButton>
+              Add
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
+        <IonHeader>
+          <IonToolbar>
+            <IonInput placeholder='Title'/>
+          </IonToolbar>
+        </IonHeader>
+        <IonTextarea />
+      </IonContent>
+    </IonModal>
+  );
+};
