@@ -1,6 +1,11 @@
 import { IonList } from "@ionic/react";
 
-const Todos: React.FC = () => {
+interface iTodosProps {
+  name: string;
+}
+
+
+const Todos: React.FC<iTodosProps> = ({ name }) => {
   return (
     <IonList>
 

@@ -1,11 +1,11 @@
 import { IonHeader, IonList, IonModal, IonTitle, IonToolbar } from '@ionic/react';
 import './Notes.css';
 
-interface ContainerProps {
+interface iNoteProps {
   name: string;
 }
 
-const ExploreContainer: React.FC<ContainerProps> = ({ name }) => {
+const Notes: React.FC<iNoteProps> = ({ name }) => {
   return (
     <IonList>
 
@@ -13,4 +13,4 @@ const ExploreContainer: React.FC<ContainerProps> = ({ name }) => {
   );
 };
 
-export default ExploreContainer;
+export default Notes;

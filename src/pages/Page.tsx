@@ -64,7 +64,7 @@ const Page: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         { name === "notes" && <Notes name={name} /> }
-        { name === "todos" && <Notes name={name} /> }
+        { name === "todos" && <Todos name={name} /> }
       </IonContent>
       <AddModal
         isModalOpen={isModalOpen}
