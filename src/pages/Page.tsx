@@ -50,7 +50,9 @@ const Page: React.FC = () => {
         { name === "notes" && <Notes name={name} /> }
         { name === "todos" && <Notes name={name} /> }
       </IonContent>
-      <AddModal isModalOpen={isModalOpen}/>
+      <AddModal
+        isModalOpen={isModalOpen}
+        nameParam={name}/>
       <IonFab horizontal='end' vertical='bottom'>
         <IonFabButton onClick={() => dispatch(openModal(true))}>
           <IonIcon icon={add}/>
@@ -64,9 +66,10 @@ export default Page;
 
 interface iAddModalProps {
   isModalOpen: boolean
+  nameParam: string
 };
 
-const AddModal: React.FC<iAddModalProps> = ({ isModalOpen }) => {
+const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
   const dispatch = useDispatch();
 
   return (
@@ -74,7 +77,7 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen }) => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>
-            Add Note
+            Add {nameParam}
           </IonTitle>
           <IonButtons slot='start'>
             <IonButton onClick={() => dispatch(openModal(false))}>
@@ -91,10 +94,13 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen }) => {
       <IonContent>
         <IonHeader>
           <IonToolbar>
-            <IonInput placeholder='Title'/>
+            <IonInput
+              placeholder='Title'/>
           </IonToolbar>
         </IonHeader>
-        <IonTextarea />
+        <IonTextarea
+          autoGrow
+          autofocus/>
       </IonContent>
     </IonModal>
   );
