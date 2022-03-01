@@ -1,11 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import Amplify from 'aws-amplify';
 
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import store from './redux/store';
+import awsconfig from './aws-exports';
+
+Amplify.configure(awsconfig);
 
 ReactDOM.render(
   <React.StrictMode>
