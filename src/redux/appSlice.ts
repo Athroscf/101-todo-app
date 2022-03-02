@@ -33,6 +33,8 @@ const appSlice = createSlice({
     initApp(state, action) {},
     createNote(state, action) {},
     createTodo(state, action) {},
+    deleteNote(state, action) {},
+    deleteTodo(state, action) {},
     getError(state, action) {
       state.error = action.payload;
     },
@@ -53,7 +55,9 @@ const appSlice = createSlice({
     },
     showToast(state, action) {
       state.showToast = !state.showToast
-    }
+    },
+    updateNote(state, action) {},
+    updateTodo(state, action) {},
   }
 });
 
@@ -61,13 +65,17 @@ export const {
   initApp,
   createNote,
   createTodo,
+  deleteNote,
+  deleteTodo,
   getError,
   getNotes,
   getTodos,
   isLoading,
   openModal,
   setToastMessage,
-  showToast
+  showToast,
+  updateNote,
+  updateTodo
 } = appSlice.actions;
 
 export default appSlice.reducer;

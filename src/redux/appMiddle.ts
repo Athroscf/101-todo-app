@@ -70,12 +70,15 @@ export const appMiddle = (store: any) => (next: any) => async (action: any) => {
       break;
     case 'app/deleteNote':
       store.dispatch(isLoading(true));
+      const deleteNote = {
+        id: action.payload
+      }
       try {
         (await API.graphql(
           graphqlOperation(deleteNotes, {
-            input: action.payload
+            input: deleteNote
           })
-        ))
+        ));
         store.dispatch(isLoading(false));
         store.dispatch(setToastMessage('Item deleted!'));
         store.dispatch(showToast(true));
@@ -83,16 +86,21 @@ export const appMiddle = (store: any) => (next: any) => async (action: any) => {
       break;
     case 'app/deleteTodo':
       store.dispatch(isLoading(true));
+      const deleteTodo = {
+        id: action.payload
+      }
       try {
         (await API.graphql(
           graphqlOperation(deleteTask, {
-            input: action.payload
+            input: deleteTodo
           })
         ))
         store.dispatch(isLoading(false));
         store.dispatch(setToastMessage('Item deleted!'));
         store.dispatch(showToast(true));
-      } catch (error) {}
+      } catch (error) {
+        console.log(error)
+      }
       break;
     case 'app/updateNote':
       store.dispatch(isLoading(true));
