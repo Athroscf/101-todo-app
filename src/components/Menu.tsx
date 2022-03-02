@@ -1,4 +1,6 @@
 import {
+  IonBadge,
+  IonButton,
   IonContent,
   IonIcon,
   IonItem,
@@ -9,10 +11,18 @@ import {
   IonMenuToggle,
   IonNote,
 } from '@ionic/react';
-
 import { useLocation } from 'react-router-dom';
-import { archiveOutline, archiveSharp, bookmarkOutline, checkmarkCircle, checkmarkCircleOutline, clipboard, clipboardOutline, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import {
+  checkmarkCircle,
+  checkmarkCircleOutline,
+  clipboard,
+  clipboardOutline,
+  logOutOutline
+} from 'ionicons/icons';
+import { Auth } from 'aws-amplify';
+
 import './Menu.css';
+import { useEffect, useState } from 'react';
 
 interface AppPage {
   url: string;
@@ -38,13 +48,23 @@ const appPages: AppPage[] = [
 
 const Menu: React.FC = () => {
   const location = useLocation();
+  const [ user, setUser ] = useState<string>('');
+  const [ email, setEmail ] = useState<string>('');
+
+  useEffect(() => {
+    Auth.currentAuthenticatedUser()
+      .then(user => {
+        setUser(user.username);
+        setEmail(user.attributes.email);
+      });
+  }, [])
 
   return (
     <IonMenu contentId="main" type="overlay">
       <IonContent>
         <IonList id="inbox-list">
-          <IonListHeader>Inbox</IonListHeader>
-          <IonNote>hi@ionicframework.com</IonNote>
+          <IonListHeader>{user}</IonListHeader>
+          <IonNote>{email}</IonNote>
           {appPages.map((appPage, index) => {
             return (
               <IonMenuToggle key={index} autoHide={false}>
@@ -55,6 +75,12 @@ const Menu: React.FC = () => {
               </IonMenuToggle>
             );
           })}
+          <IonList id="labels-list">
+            <IonItem lines="none" button onClick={() => Auth.signOut()}>
+              <IonIcon slot="start" icon={logOutOutline} />
+              <IonLabel>Log Out</IonLabel>
+            </IonItem>
+        </IonList>
         </IonList>
       </IonContent>
     </IonMenu>
