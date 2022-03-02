@@ -5,6 +5,7 @@ input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONL
 type Task @model {
   id: ID!
   task: String!
+  important: Boolean!
 }
 
 type Notes @model {

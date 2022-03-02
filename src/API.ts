@@ -5,10 +5,12 @@
 export type CreateTaskInput = {
   id?: string | null,
   task: string,
+  important: boolean,
 };
 
 export type ModelTaskConditionInput = {
   task?: ModelStringInput | null,
+  important?: ModelBooleanInput | null,
   and?: Array< ModelTaskConditionInput | null > | null,
   or?: Array< ModelTaskConditionInput | null > | null,
   not?: ModelTaskConditionInput | null,
@@ -54,10 +56,18 @@ export type ModelSizeInput = {
   between?: Array< number | null > | null,
 };
 
+export type ModelBooleanInput = {
+  ne?: boolean | null,
+  eq?: boolean | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+};
+
 export type Task = {
   __typename: "Task",
   id: string,
   task: string,
+  important: boolean,
   createdAt: string,
   updatedAt: string,
 };
@@ -65,6 +75,7 @@ export type Task = {
 export type UpdateTaskInput = {
   id: string,
   task?: string | null,
+  important?: boolean | null,
 };
 
 export type DeleteTaskInput = {
@@ -107,6 +118,7 @@ export type DeleteNotesInput = {
 export type ModelTaskFilterInput = {
   id?: ModelIDInput | null,
   task?: ModelStringInput | null,
+  important?: ModelBooleanInput | null,
   and?: Array< ModelTaskFilterInput | null > | null,
   or?: Array< ModelTaskFilterInput | null > | null,
   not?: ModelTaskFilterInput | null,
@@ -159,6 +171,7 @@ export type CreateTaskMutation = {
     __typename: "Task",
     id: string,
     task: string,
+    important: boolean,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -174,6 +187,7 @@ export type UpdateTaskMutation = {
     __typename: "Task",
     id: string,
     task: string,
+    important: boolean,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -189,6 +203,7 @@ export type DeleteTaskMutation = {
     __typename: "Task",
     id: string,
     task: string,
+    important: boolean,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -251,6 +266,7 @@ export type GetTaskQuery = {
     __typename: "Task",
     id: string,
     task: string,
+    important: boolean,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -269,6 +285,7 @@ export type ListTasksQuery = {
       __typename: "Task",
       id: string,
       task: string,
+      important: boolean,
       createdAt: string,
       updatedAt: string,
     } | null >,
@@ -317,6 +334,7 @@ export type OnCreateTaskSubscription = {
     __typename: "Task",
     id: string,
     task: string,
+    important: boolean,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -327,6 +345,7 @@ export type OnUpdateTaskSubscription = {
     __typename: "Task",
     id: string,
     task: string,
+    important: boolean,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -337,6 +356,7 @@ export type OnDeleteTaskSubscription = {
     __typename: "Task",
     id: string,
     task: string,
+    important: boolean,
     createdAt: string,
     updatedAt: string,
   } | null,

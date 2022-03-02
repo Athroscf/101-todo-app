@@ -7,6 +7,7 @@ export const getTask = /* GraphQL */ `
     getTask(id: $id) {
       id
       task
+      important
       createdAt
       updatedAt
     }
@@ -22,6 +23,7 @@ export const listTasks = /* GraphQL */ `
       items {
         id
         task
+        important
         createdAt
         updatedAt
       }

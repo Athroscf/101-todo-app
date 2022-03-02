@@ -90,6 +90,7 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
   const [ title, setTitle ] = useState<string>('');
   const [ description, setDescription ] = useState<string>('');
   const [ task, setTask ] = useState<string>('');
+  const [ important, setImportant ] = useState<boolean>(false);
 
   const handleAdd = () => {
     if (nameParam === 'notes') {
@@ -99,7 +100,8 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
       }));
     } else {
       dispatch(createTodo({
-        task: task
+        task: task,
+        important: important
       }));
     };
   };
@@ -132,7 +134,9 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
       { nameParam === 'todos' &&
         <AddTodoModalContentProps
           task={task}
-          setTask={setTask}/>}
+          setTask={setTask}
+          important={important}
+          setImportant={setImportant}/>}
     </IonModal>
   );
 };
@@ -171,9 +175,11 @@ const AddNoteModalContentProps: React.FC<iAddNoteModalContentProps> = ({ title, 
 interface iAddTodoModalContentProps {
   task: string
   setTask: (task: string) => void
-}
+  important: boolean
+  setImportant: (important: boolean) => void
+};
 
-const AddTodoModalContentProps: React.FC<iAddTodoModalContentProps> = ({ task, setTask }) => {
+const AddTodoModalContentProps: React.FC<iAddTodoModalContentProps> = ({ task, setTask, important, setImportant }) => {
   return (
     <IonContent>
       <IonHeader>
@@ -187,7 +193,7 @@ const AddTodoModalContentProps: React.FC<iAddTodoModalContentProps> = ({ task, s
       <IonItemDivider />
       <IonItem>
         <IonLabel position='fixed'>Important</IonLabel>
-        <IonToggle slot='end'/>
+        <IonToggle slot='end' onIonChange={e => setImportant(e.detail.checked)}/>
       </IonItem>
     </IonContent>
   );

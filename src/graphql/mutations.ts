@@ -10,6 +10,7 @@ export const createTask = /* GraphQL */ `
     createTask(input: $input, condition: $condition) {
       id
       task
+      important
       createdAt
       updatedAt
     }
@@ -23,6 +24,7 @@ export const updateTask = /* GraphQL */ `
     updateTask(input: $input, condition: $condition) {
       id
       task
+      important
       createdAt
       updatedAt
     }
@@ -36,6 +38,7 @@ export const deleteTask = /* GraphQL */ `
     deleteTask(input: $input, condition: $condition) {
       id
       task
+      important
       createdAt
       updatedAt
     }
