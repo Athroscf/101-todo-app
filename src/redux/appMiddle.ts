@@ -7,21 +7,24 @@ import {
   getNotes,
   getTodos,
   isLoading,
-  initApp
+  initApp,
+  openModal,
+  setToastMessage,
+  showToast
 } from './appSlice';
-import { createNotes } from '../graphql/mutations';
-import { createTask } from '../graphql/mutations';
+import { createNotes, deleteNotes, updateNotes } from '../graphql/mutations';
+import { createTask, deleteTask, updateTask } from '../graphql/mutations';
 import { listNotes } from '../graphql/queries';
 import { listTasks } from '../graphql/queries';
 
 export const appMiddle = (store: any) => (next: any) => async (action: any) => {
   switch (action.type) {
-    case '@@INIT':
+    case 'app/initApp':
       const notesQuery = (await API.graphql(
         graphqlOperation(listNotes)
       )) as GraphQLResult<APIt.ListNotesQuery>
       if (notesQuery?.data) {
-        store.dispatch(getNotes(notesQuery?.data?.listNotes));
+        store.dispatch(getNotes(notesQuery?.data));
       } else {
         store.dispatch(getError(notesQuery?.errors));
       };
@@ -38,35 +41,84 @@ export const appMiddle = (store: any) => (next: any) => async (action: any) => {
 
     case 'app/createNote':
       store.dispatch(isLoading(true));
-      const inputData = action.payload;
-      console.log(inputData)
-      const createNotesMutation = (await API.graphql(
-        graphqlOperation(createNotes, {
-          input: action.payload
-        }
-      ))) as GraphQLResult<APIt.CreateNotesMutation>
-      console.log(createNotesMutation);
-      if (createNotesMutation?.data) {
+      try {
+        (await API.graphql(
+          graphqlOperation(createNotes, {
+            input: action.payload
+          }
+        )))
         store.dispatch(isLoading(false));
-        store.dispatch(initApp);
-      } else {
-        store.dispatch(getError(createNotesMutation?.errors));
-      };
+        store.dispatch(openModal(false));
+        store.dispatch(setToastMessage('Item added!'));
+        store.dispatch(showToast(true));
+      } catch (error) {}
       break;
 
     case 'app/createTodo':
       store.dispatch(isLoading(true));
-      const createTodosMutation = (await API.graphql(
-        graphqlOperation(createTask, {
-          input: action.payload
-        })
-      )) as GraphQLResult<APIt.CreateNotesMutation>
-      if (createTodosMutation?.data) {
+      try {
+        (await API.graphql(
+          graphqlOperation(createTask, {
+            input: action.payload
+          })
+        ))
         store.dispatch(isLoading(false));
-        store.dispatch(initApp);
-      } else {
-        store.dispatch(getError(createTodosMutation?.errors));
-      };
+        store.dispatch(openModal(false));
+        store.dispatch(setToastMessage('Item added!'));
+        store.dispatch(showToast(true));
+      } catch (error) {}
+      break;
+    case 'app/deleteNote':
+      store.dispatch(isLoading(true));
+      try {
+        (await API.graphql(
+          graphqlOperation(deleteNotes, {
+            input: action.payload
+          })
+        ))
+        store.dispatch(isLoading(false));
+        store.dispatch(setToastMessage('Item deleted!'));
+        store.dispatch(showToast(true));
+      } catch (error) {}
+      break;
+    case 'app/deleteTodo':
+      store.dispatch(isLoading(true));
+      try {
+        (await API.graphql(
+          graphqlOperation(deleteTask, {
+            input: action.payload
+          })
+        ))
+        store.dispatch(isLoading(false));
+        store.dispatch(setToastMessage('Item deleted!'));
+        store.dispatch(showToast(true));
+      } catch (error) {}
+      break;
+    case 'app/updateNote':
+      store.dispatch(isLoading(true));
+      try {
+        (await API.graphql(
+          graphqlOperation(updateNotes, {
+            input: action.payload
+          })
+        ))
+        store.dispatch(isLoading(false));
+        store.dispatch(setToastMessage('Item edited!'));
+        store.dispatch(showToast(true));
+      } catch (error) {}
+      break;
+    case 'app/updateTask':
+      store.dispatch(isLoading(true));
+      try {
+        (await API.graphql(
+          graphqlOperation(updateTask, {
+            input: action.payload
+          })
+        ))
+        store.dispatch(isLoading(false));
+        store.dispatch(setToastMessage('Item edited!'));
+        store.dispatch(showToast(true));
+      } catch (error) {}
       break;
 
     default:
