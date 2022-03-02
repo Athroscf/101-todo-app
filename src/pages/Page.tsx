@@ -39,7 +39,7 @@ import Notes from '../components/Notes';
 import Todos from '../components/Todos';
 import './Page.css';
 import { RootState } from '../redux/store';
-import { openModal } from '../redux/appSlice';
+import { createNote, createTodo, openModal } from '../redux/appSlice';
 
 const Page: React.FC = () => {
   const { name } = useParams<{ name: string; }>();
@@ -91,6 +91,19 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
   const [ description, setDescription ] = useState<string>('');
   const [ task, setTask ] = useState<string>('');
 
+  const handleAdd = () => {
+    if (nameParam === 'notes') {
+      dispatch(createNote({
+        title: title,
+        description: description
+      }));
+    } else {
+      dispatch(createTodo({
+        task: task
+      }));
+    };
+  };
+
   return (
     <IonModal isOpen={isModalOpen}>
       <IonHeader>
@@ -104,7 +117,7 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
             </IonButton>
           </IonButtons>
           <IonButtons slot='end'>
-            <IonButton>
+            <IonButton onClick={() => handleAdd()}>
               Add
             </IonButton>
           </IonButtons>
@@ -179,3 +192,61 @@ const AddTodoModalContentProps: React.FC<iAddTodoModalContentProps> = ({ task, s
     </IonContent>
   );
 };
+
+// const categories = [
+//   {
+//     category: 'Travel',
+//     color: '#7e5d4e'
+//   },
+//   {
+//     category: 'Personal',
+//     color: '#009788'
+//   },
+//   {
+//     category: 'Life',
+//     color: '#4baf4f'
+//   },
+//   {
+//     category: 'Work',
+//     color: '#f44437'
+//   },
+//   {
+//     category: 'Social',
+//     color: '#3f51b5'
+//   },
+// ];
+
+// const colors = [
+//   {
+//     name: 'Yellow',
+//     color: '#ffeb3c'
+//   },
+//   {
+//     name: 'Orange',
+//     color: '#ff9900'
+//   },
+//   {
+//     name: 'Red',
+//     color: '#f44437'
+//   },
+//   {
+//     name: 'Fucsia',
+//     color: '#ea1e63'
+//   },
+//   {
+//     name: 'Purple',
+//     color: '#9c26b0'
+//   },
+//   {
+//     name: 'Blue',
+//     color: '#3f51b5'
+//   },
+//   {
+//     name: 'Green',
+//     color: '#4baf4f'
+//   },
+//   {
+//     name: 'Brown',
+//     color: '#7e5d4e'
+//   }
+// ];
