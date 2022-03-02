@@ -1,23 +1,19 @@
 import {
-  IonBadge,
-  IonCard,
-  IonCardTitle,
+  IonCheckbox,
   IonIcon,
   IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
+  IonLabel,
   IonList
 } from "@ionic/react";
 import {
   alert
 } from 'ionicons/icons';
-import { useDispatch, useSelector } from "react-redux";
-import { API, graphqlOperation } from 'aws-amplify';
-import { GraphQLResult } from '@aws-amplify/api';
-import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Auth } from 'aws-amplify';
+import { useState } from "react";
 
 import * as APIt from '../API';
+import './Todos.css'
 
 /**
  * Notes component description.
@@ -38,26 +34,25 @@ interface iTodosProps {
 }
 
 const Todos: React.FC<iTodosProps> = ({ name, todos }) => {
-  const dispatch = useDispatch();
+  const [ user, setUser ] = useState<string>('');
+
+  Auth.currentAuthenticatedUser()
+    .then(user => setUser(user.username));
 
   return (
     <IonList>
-      { todos?.listTasks?.items.map((todo, index) => (
-        <IonItemSliding key={index}>
-          <IonItemOptions>
-            <IonItemOption color="danger" slot="start">
-              Delete
-            </IonItemOption>
-            <IonItem>
-              <IonBadge>{todo?.task}</IonBadge>
-              { todo?.important ? <IonIcon icon={alert}  color="danger"/> : null }
-            </IonItem>
-            <IonItemOption color="danger" slot="end">
-              Edit
-            </IonItemOption>
-          </IonItemOptions>
-        </IonItemSliding>
-      ))}
+      { todos?.listTasks?.items.map((todo, index) => {
+        return (
+          <div key={todo?.id}>
+            { todo?.user === user &&
+              <IonItem>
+                <IonCheckbox slot="start" checked={todo?.checked}/>
+                <IonLabel>{todo?.task}</IonLabel>
+                { todo?.important ? <IonIcon icon={alert} color='danger'/> : null }
+              </IonItem> }
+          </div>
+        )
+      })}
     </IonList>
   )
 };

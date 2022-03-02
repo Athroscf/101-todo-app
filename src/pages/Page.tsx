@@ -14,6 +14,8 @@ import {
   IonModal,
   IonPage,
   IonProgressBar,
+  IonRefresher,
+  IonRefresherContent,
   IonTextarea,
   IonTitle,
   IonToast,
@@ -21,12 +23,12 @@ import {
   IonToolbar
 } from '@ionic/react';
 import {
-  add
+  add, chevronDownCircleOutline
 } from 'ionicons/icons';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { API, graphqlOperation } from 'aws-amplify';
+import { API, Auth, graphqlOperation } from 'aws-amplify';
 import { GraphQLResult } from '@aws-amplify/api';
 
 import Notes from '../components/Notes';
@@ -69,7 +71,7 @@ const Page: React.FC = () => {
       const todosList = (await API.graphql(
         graphqlOperation(listTasks)
       )) as GraphQLResult<APIt.ListTasksQuery>;
-      setTodos(todosList?.data)
+      setTodos(todosList?.data);
       dispatch(isLoading(false));
     } catch (error) {}
   };
@@ -89,14 +91,6 @@ const Page: React.FC = () => {
     } catch (error) {}
   };
 
-  const Content: React.FC = () => {
-    if ( name === 'notes') {
-      return <Notes name={name} notes={notes}/>
-    } else {
-      return<Todos name={name} todos={todos}/>
-    };
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -110,18 +104,22 @@ const Page: React.FC = () => {
           type='indeterminate'
           hidden={!loading}/>
       </IonHeader>
-
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        { !isLoading ? <Content /> : null }
+        { name === 'notes' && <Notes name={name} notes={notes}/> }
+        { name === 'todos' && <Todos name={name} todos={todos}/> }
       </IonContent>
       <AddModal
         isModalOpen={isModalOpen}
-        nameParam={name}/>
+        nameParam={name}
+        onDismiss={() => {
+          getNotes();
+          getTodos();
+        }}/>
       <IonFab horizontal='end' vertical='bottom'>
         <IonFabButton onClick={() => dispatch(openModal(true))}>
           <IonIcon icon={add}/>
@@ -147,9 +145,10 @@ export default Page;
 interface iAddModalProps {
   isModalOpen: boolean
   nameParam: string
+  onDismiss: () => void
 };
 
-const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
+const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam, onDismiss }) => {
   /**
    * title: string (Note title that will be passed for submitting.)
    * description: string (Note description that will be passed for submitting.)
@@ -161,6 +160,10 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
   const [ description, setDescription ] = useState<string>('');
   const [ task, setTask ] = useState<string>('');
   const [ important, setImportant ] = useState<boolean>(false);
+  const [ user, setUser ] = useState<string>('');
+
+  Auth.currentAuthenticatedUser()
+    .then(user => setUser(user.username));
 
   /**
    * handleAdd function dispatches a redux action and passes input data for adding the item.
@@ -170,18 +173,21 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
     if (nameParam === 'notes') {
       dispatch(createNote({
         title: title,
-        description: description
+        description: description,
+        user: user
       }));
     } else {
       dispatch(createTodo({
         task: task,
-        important: important
+        important: important,
+        checked: false,
+        user: user
       }));
     };
   };
 
   return (
-    <IonModal isOpen={isModalOpen}>
+    <IonModal isOpen={isModalOpen} onDidDismiss={onDismiss}>
       <IonHeader>
         <IonToolbar>
           <IonTitle>

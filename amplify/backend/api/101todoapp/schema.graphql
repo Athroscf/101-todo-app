@@ -6,10 +6,13 @@ type Task @model {
   id: ID!
   task: String!
   important: Boolean!
+  checked: Boolean!
+  user: String!
 }
 
 type Notes @model {
   id: ID!
   title: String!
   description: String
+  user: String!
 }

@@ -1,27 +1,18 @@
 import {
-  IonBadge,
-  IonHeader,
-  IonIcon,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
   IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
   IonList,
-  IonModal,
-  IonTitle,
-  IonToolbar
 } from '@ionic/react';
-import {
-  alert
-} from 'ionicons/icons';
-import { API, graphqlOperation } from 'aws-amplify';
-import { GraphQLResult } from '@aws-amplify/api';
-import { useState, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { Auth } from 'aws-amplify';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import * as APIt from '../API';
 import './Notes.css';
-import { RootState } from '../redux/store';
 
 /**
  * Notes component description.
@@ -43,24 +34,30 @@ interface iNoteProps {
 
 const Notes: React.FC<iNoteProps> = ({ name, notes }) => {
   const dispatch = useDispatch();
+  const [ user, setUser ] = useState<string>('');
+
+  Auth.currentAuthenticatedUser()
+    .then(user => setUser(user.username));
 
   return (
     <IonList>
-      { notes?.listNotes?.items.map((note, index) => (
-        <IonItemSliding key={index}>
-          <IonItemOptions>
-            <IonItemOption color="danger" slot="start">
-              Delete
-            </IonItemOption>
-            <IonItem>
-              <IonBadge>{note?.title}</IonBadge>
-            </IonItem>
-            <IonItemOption color="danger" slot="end">
-              Edit
-            </IonItemOption>
-          </IonItemOptions>
-        </IonItemSliding>
-      ))}
+      { notes?.listNotes?.items.map((note, index) => {
+        return (
+          <div key={note?.id}>
+            { note?.user === user &&
+              <IonItem>
+                <IonCard>
+                  <IonCardHeader>
+                    <IonCardTitle>{note?.title}</IonCardTitle>
+                  </IonCardHeader>
+                  <IonCardContent>
+                    <IonCardSubtitle>{note?.description?.slice(0, 20)}...</IonCardSubtitle>
+                  </IonCardContent>
+                </IonCard>
+              </IonItem> }
+          </div>
+        )
+      })}
     </IonList>
   )
 };

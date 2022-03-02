@@ -11,6 +11,8 @@ export const createTask = /* GraphQL */ `
       id
       task
       important
+      checked
+      user
       createdAt
       updatedAt
     }
@@ -25,6 +27,8 @@ export const updateTask = /* GraphQL */ `
       id
       task
       important
+      checked
+      user
       createdAt
       updatedAt
     }
@@ -39,6 +43,8 @@ export const deleteTask = /* GraphQL */ `
       id
       task
       important
+      checked
+      user
       createdAt
       updatedAt
     }
@@ -53,6 +59,7 @@ export const createNotes = /* GraphQL */ `
       id
       title
       description
+      user
       createdAt
       updatedAt
     }
@@ -67,6 +74,7 @@ export const updateNotes = /* GraphQL */ `
       id
       title
       description
+      user
       createdAt
       updatedAt
     }
@@ -81,6 +89,7 @@ export const deleteNotes = /* GraphQL */ `
       id
       title
       description
+      user
       createdAt
       updatedAt
     }
