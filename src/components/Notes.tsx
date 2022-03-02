@@ -6,12 +6,18 @@ import {
   IonCardTitle,
   IonItem,
   IonList,
+  useIonActionSheet
 } from '@ionic/react';
 import { Auth } from 'aws-amplify';
+import {
+  create,
+  trash
+} from 'ionicons/icons';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import * as APIt from '../API';
+import { deleteNote, openModal } from '../redux/appSlice';
 import './Notes.css';
 
 /**
@@ -30,11 +36,13 @@ import './Notes.css';
 interface iNoteProps {
   name: string;
   notes: APIt.ListNotesQuery | undefined
+  getNotes: () => void
 }
 
-const Notes: React.FC<iNoteProps> = ({ name, notes }) => {
-  const dispatch = useDispatch();
+const Notes: React.FC<iNoteProps> = ({ name, notes, getNotes }) => {
   const [ user, setUser ] = useState<string>('');
+  const [ presentConfirmation, dismissConfirmation ] = useIonActionSheet();
+  const dispatch = useDispatch();
 
   Auth.currentAuthenticatedUser()
     .then(user => setUser(user.username));
@@ -45,13 +53,35 @@ const Notes: React.FC<iNoteProps> = ({ name, notes }) => {
         return (
           <div key={note?.id}>
             { note?.user === user &&
-              <IonItem>
+              <IonItem button onClick={() => {
+                presentConfirmation({
+                  buttons: [
+                    {
+                      text: "Delete",
+                      role: "destructive",
+                      icon: trash,
+                      handler: () => {
+                        dispatch(deleteNote(note?.id))
+                        getNotes()
+                      }
+                    },
+                    {
+                      text: "Edit",
+                      role: "selected",
+                      icon: create,
+                      handler: () => {
+                        dispatch(openModal(true))
+                      }
+                    }
+                  ]
+                })
+              }}>
                 <IonCard>
                   <IonCardHeader>
                     <IonCardTitle>{note?.title}</IonCardTitle>
                   </IonCardHeader>
                   <IonCardContent>
-                    <IonCardSubtitle>{note?.description?.slice(0, 20)}...</IonCardSubtitle>
+                    <IonCardSubtitle>{note?.description?.slice(0, 30)}</IonCardSubtitle>
                   </IonCardContent>
                 </IonCard>
               </IonItem> }
