@@ -28,7 +28,20 @@ import './theme/variables.css';
 
 setupIonicReact();
 
+/**
+ * App component description.
+ */
+
 const App: React.FC = () => {
+  /**
+   * Component where routing is handled.
+   * There are 2 routes: /page/notes and /page/todos
+   */
+
+  /**
+   * Authentication is handled in this component through Amplify and its Auth class which
+   * automates the process.
+   */
   return (
     <IonApp>
       <IonReactRouter>

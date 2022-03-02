@@ -1,7 +1,6 @@
 import {
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
   IonFab,
   IonFabButton,
@@ -11,40 +10,92 @@ import {
   IonItem,
   IonItemDivider,
   IonLabel,
-  IonList,
   IonMenuButton,
   IonModal,
   IonPage,
-  IonPopover,
-  IonRadio,
-  IonRadioGroup,
-  IonRow,
-  IonSegment,
-  IonSegmentButton,
-  IonSelect,
-  IonSelectOption,
+  IonProgressBar,
   IonTextarea,
   IonTitle,
+  IonToast,
   IonToggle,
   IonToolbar
 } from '@ionic/react';
 import {
   add
 } from 'ionicons/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
+import { API, graphqlOperation } from 'aws-amplify';
+import { GraphQLResult } from '@aws-amplify/api';
 
 import Notes from '../components/Notes';
 import Todos from '../components/Todos';
+import * as APIt from '../API';
 import './Page.css';
 import { RootState } from '../redux/store';
-import { createNote, createTodo, openModal } from '../redux/appSlice';
+import { createNote, createTodo, isLoading, openModal } from '../redux/appSlice';
+import { listNotes, listTasks } from '../graphql/queries';
+
+/**
+ * Page component description.
+ * This component handles renders both Notes and Todos and fetches its data.
+ */
 
 const Page: React.FC = () => {
+  /**
+   * name: path parameter
+   * todos: list of todos
+   * notes: list of notes
+   */
   const { name } = useParams<{ name: string; }>();
-  const { isModalOpen } = useSelector((state: RootState) => state)
+  const { isModalOpen, loading, toastMessage, showToast } = useSelector((state: RootState) => state)
+  const [ todos, setTodos ] = useState({} as APIt.ListTasksQuery | undefined);
+  const [ notes, setNotes ] = useState({} as APIt.ListNotesQuery | undefined);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    getTodos();
+    getNotes()
+  }, [name]);
+
+  /**
+   * getTodos function fetches a list of all to do tasks created by the user.
+   */
+
+  const getTodos = async () => {
+    dispatch(isLoading(true));
+    try {
+      const todosList = (await API.graphql(
+        graphqlOperation(listTasks)
+      )) as GraphQLResult<APIt.ListTasksQuery>;
+      setTodos(todosList?.data)
+      dispatch(isLoading(false));
+    } catch (error) {}
+  };
+
+  /**
+   * getNotes function fetches a list of all notes created by the user.
+   */
+
+  const getNotes = async () => {
+    dispatch(isLoading(true));
+    try {
+      const notesList = (await API.graphql(
+        graphqlOperation(listNotes)
+      )) as GraphQLResult<APIt.ListNotesQuery>;
+      setNotes(notesList?.data)
+      dispatch(isLoading(false));
+    } catch (error) {}
+  };
+
+  const Content: React.FC = () => {
+    if ( name === 'notes') {
+      return <Notes name={name} notes={notes}/>
+    } else {
+      return<Todos name={name} todos={todos}/>
+    };
+  };
 
   return (
     <IonPage>
@@ -55,6 +106,9 @@ const Page: React.FC = () => {
           </IonButtons>
           <IonTitle>{name}</IonTitle>
         </IonToolbar>
+        <IonProgressBar
+          type='indeterminate'
+          hidden={!loading}/>
       </IonHeader>
 
       <IonContent fullscreen>
@@ -63,8 +117,7 @@ const Page: React.FC = () => {
             <IonTitle size="large">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        { name === "notes" && <Notes name={name} /> }
-        { name === "todos" && <Todos name={name} /> }
+        { !isLoading ? <Content /> : null }
       </IonContent>
       <AddModal
         isModalOpen={isModalOpen}
@@ -74,23 +127,44 @@ const Page: React.FC = () => {
           <IonIcon icon={add}/>
         </IonFabButton>
       </IonFab>
+      <IonToast message={toastMessage} isOpen={showToast} duration={2000}/>
     </IonPage>
   );
 };
 
 export default Page;
 
+/**
+ * Description of AddModal component.
+ * This is a modal that handles the creation of a note or a to do task.
+ */
+
+/**
+ * Parameters AddModal component has to recieve:
+ * isModalOpen: boolean (handles when the modal will show up.)
+ * nameParam: string (title of the modal to know what are we adding. It's also used for adding dynamically.)
+ */
 interface iAddModalProps {
   isModalOpen: boolean
   nameParam: string
 };
 
 const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
+  /**
+   * title: string (Note title that will be passed for submitting.)
+   * description: string (Note description that will be passed for submitting.)
+   * task: string (To do task title that will be passed for submitting.)
+   * important: boolean (To do task importance that will be passed for submitting.)
+   */
   const dispatch = useDispatch();
   const [ title, setTitle ] = useState<string>('');
   const [ description, setDescription ] = useState<string>('');
   const [ task, setTask ] = useState<string>('');
   const [ important, setImportant ] = useState<boolean>(false);
+
+  /**
+   * handleAdd function dispatches a redux action and passes input data for adding the item.
+   */
 
   const handleAdd = () => {
     if (nameParam === 'notes') {
@@ -126,13 +200,13 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
         </IonToolbar>
       </IonHeader>
       { nameParam === 'notes' &&
-        <AddNoteModalContentProps
+        <AddNoteModalContent
           title={title}
           setTitle={setTitle}
           description={description}
           setDescription={setDescription}/>}
       { nameParam === 'todos' &&
-        <AddTodoModalContentProps
+        <AddTodoModalContent
           task={task}
           setTask={setTask}
           important={important}
@@ -141,6 +215,17 @@ const AddModal: React.FC<iAddModalProps> = ({ isModalOpen, nameParam }) => {
   );
 };
 
+/**
+ * AddNoteModalContent description.
+ * AddNoteModalContent contains the fields for the Notes item that will be created.
+ * 
+ * Parameters AddNoteModalContent component has to recieve:
+ * title: string (title field.)
+ * setTitle: void function (setTitle function in useState)
+ * description: string (description field.)
+ * setDescription: void function (setDescription function in useState)
+ */
+
 interface iAddNoteModalContentProps {
   title: string
   setTitle: (title: string) => void
@@ -148,7 +233,7 @@ interface iAddNoteModalContentProps {
   setDescription: (description: string) => void
 };
 
-const AddNoteModalContentProps: React.FC<iAddNoteModalContentProps> = ({ title, setTitle, description, setDescription }) => {
+const AddNoteModalContent: React.FC<iAddNoteModalContentProps> = ({ title, setTitle, description, setDescription }) => {
   const [ popupOpen, setPopupOpen ] = useState<boolean>(false);
 
   return (
@@ -172,6 +257,17 @@ const AddNoteModalContentProps: React.FC<iAddNoteModalContentProps> = ({ title, 
   );
 };
 
+/**
+ * AddTodoModalContent description.
+ * AddTodoModalContent contains the fields for the Notes item that will be created.
+ *
+ * Parameters AddTodoModalContent component has to recieve:
+ * task: string (task field.)
+ * setTask: void function (setTask function in useState)
+ * important: boolean (important field.)
+ * setImportant: void function (setImportant function in useState)
+ */
+
 interface iAddTodoModalContentProps {
   task: string
   setTask: (task: string) => void
@@ -179,7 +275,7 @@ interface iAddTodoModalContentProps {
   setImportant: (important: boolean) => void
 };
 
-const AddTodoModalContentProps: React.FC<iAddTodoModalContentProps> = ({ task, setTask, important, setImportant }) => {
+const AddTodoModalContent: React.FC<iAddTodoModalContentProps> = ({ task, setTask, important, setImportant }) => {
   return (
     <IonContent>
       <IonHeader>

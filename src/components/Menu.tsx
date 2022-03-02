@@ -24,12 +24,31 @@ import { Auth } from 'aws-amplify';
 import './Menu.css';
 import { useEffect, useState } from 'react';
 
+/**
+ * Menu component description.
+ * This is a sidebar menu.
+ * This component handles sign out throught Amplify and its Auth class which
+ * automates the process.
+ */
+
+
+/**
+ * AppPage interface:
+ * url: string (path)
+ * iosIcon: string (icon for ios)
+ * mdIcon: string (icon for every other system)
+ * title: string (page title)
+ */
 interface AppPage {
   url: string;
   iosIcon: string;
   mdIcon: string;
   title: string;
 }
+
+/**
+ * AppPages is a list of the pages and are meant for navigation.
+ */
 
 const appPages: AppPage[] = [
   {
@@ -48,8 +67,16 @@ const appPages: AppPage[] = [
 
 const Menu: React.FC = () => {
   const location = useLocation();
+  /**
+   * user: string (current user's username)
+   * email: string (current user's email)
+   */
   const [ user, setUser ] = useState<string>('');
   const [ email, setEmail ] = useState<string>('');
+
+  /**
+   * Use Amplify Auth class to get current user info.
+   */
 
   useEffect(() => {
     Auth.currentAuthenticatedUser()
