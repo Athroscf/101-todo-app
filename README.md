@@ -7,7 +7,7 @@ A simple ToDo and notes app created for skills demonstration for CODE Exitos.
 
 https://master.d2jlvsqcwyp717.amplifyapp.com/
 
-This project is being hosted in Amplify both Frontend and Backend.
+This project is being hosted in Amplify both Frontend and Backend which means it has CI/CD.
 
 ## Tech Stack
 
